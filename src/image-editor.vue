@@ -118,15 +118,27 @@
         <div class="menu">
           <List :btns="figureList" v-model="figureNow"></List>
           <label>
-            颜色
+            填充颜色
             <input type="text" readonly="true" @click="toggleFigureColorPicker" :style="colorFigureInputSty" class="color-picker-input" />
             <div class="color-picker" v-show="figureShowShadowColorPicker">
               <color-picker v-model="figureColors" @change-color="onFigureColorChange"></color-picker>
             </div>
           </label>
           <label>
+            边框颜色
+            <input type="text" readonly="true" @click="toggleLineColorPicker" :style="colorLineInputSty" class="color-picker-input" />
+            <div class="color-picker" v-show="figureLineShowShadowColorPicker">
+              <color-picker v-model="lineColors" @change-color="onLineColorChange"></color-picker>
+            </div>
+          </label>
+
+          <label>
             不透明度
             <input type="number" v-model="figureAlpha" step="0.1" min="0" max="1" />
+          </label>
+          <label>
+            边框线宽
+            <input type="number" v-model="figureBorderW" />
           </label>
           <label>
             水平
@@ -166,7 +178,7 @@
         <Box :show="showMosaic" :width="mosaicW" :height="mosaicH" :left="mosaicL" :top="mosaicT" :borderW="mosaicBorderW" :canvasW="canvasW" :canvasH="canvasH" :canDrag="mosaicCanDrag" :canvas="$refs.canvas" @change="mosaicChange">
           <div :style="mosaicSty"></div>
         </Box>
-        <Box :show="showFigure" :width="figureW" :height="figureH" :left="figureL" :top="figureT" :borderW="figureBorderW" :canvasW="canvasW" :canvasH="canvasH" :canDrag="figureCanDrag" :canvas="$refs.canvas" @change="figureChange">
+        <Box :borderColor="lineColors.hex" :show="showFigure" :width="figureW" :height="figureH" :left="figureL" :top="figureT" :borderW="figureBorderW"  :canvasW="canvasW" :canvasH="canvasH" :canDrag="figureCanDrag" :canvas="$refs.canvas" @change="figureChange">
           <div :style="figureSty"></div>
         </Box>
       </div>
@@ -269,6 +281,9 @@ export default {
       figureColors: {
         hex: "#9E4949"
       },
+      lineColors: {
+        hex: "#000000"
+      },
 
       // action state
       canPaint: false,
@@ -310,6 +325,7 @@ export default {
       // figure state
       figureCanDrag: false,
       figureShowShadowColorPicker: false,
+      figureLineShowShadowColorPicker:false,
       figureList: figureList,
       figureNow: 0,
 
@@ -430,6 +446,8 @@ export default {
       return {
         width: this.figureW - this.figureBorderW * 2 + 'px',
         height: this.figureH - this.figureBorderW * 2 + 'px',
+        // borderColor:this.lineColors.hex,
+        // borderWidth:this.figureBorderW,
         backgroundColor: this.figureColors.hex,
         opacity: this.figureAlpha,
         borderRadius: this.figureNow == 0 ? '0' : '50%'
@@ -442,6 +460,11 @@ export default {
       }
     },
 
+    colorLineInputSty() {
+      return {
+        background: this.lineColors.hex
+      }
+    },
     // class
     // class text
     textCla() {
@@ -724,9 +747,18 @@ export default {
       this.figureShowShadowColorPicker = !this.figureShowShadowColorPicker
     },
 
+    toggleLineColorPicker() {
+      this.figureLineShowShadowColorPicker = !this.figureLineShowShadowColorPicker
+    },
+
     onFigureColorChange(val) {
       this.figureColors.hex = val.hex
     },
+
+    onLineColorChange(val) {
+      this.lineColors.hex = val.hex
+    },
+
 
     figureChange(status) {
       this.figureW = status.width
@@ -737,9 +769,10 @@ export default {
 
     paintFigure() {
       let color = this.figureColors.hex
+      let linecolor = this.lineColors.hex
       let alpha = this.figureAlpha
       if (this.figureNow == 0) {
-        DATA.ctx.rect(this.figureL, this.figureT, this.figureW, this.figureH, color, alpha)
+        DATA.ctx.rect(this.figureL, this.figureT, this.figureW, this.figureH, this.figureBorderW, color,linecolor, alpha)
       } else {
         DATA.ctx.arc(this.figureL + this.figureW / 2, this.figureT + this.figureH / 2, this.figureW / 2, this.figureH / 2, color, alpha)
       }
@@ -755,7 +788,9 @@ export default {
       this.figureNow = 0
       this.showFigureSelect = false
       this.figureAlpha = 0.5
+      this.figureBorderW = 1
       this.figureColors.hex = '#9E4949'
+      this.lineColors.hex = '#000000'
     },
 
     // filter

@@ -16,7 +16,7 @@ from '../libs/utils.js'
 
 export default {
   name: 'Box',
-  props: ['show', 'width', 'height', 'left', 'top', 'borderW', 'canvasW', 'canvasH', 'canDrag', 'canvas'],
+  props: ['show', 'width', 'height', 'left', 'top', 'borderW', 'canvasW', 'canvasH', 'canDrag', 'canvas','borderColor'],
   data() {
     return {
       boxW: this.width,
@@ -46,7 +46,8 @@ export default {
         height: this.boxH + 'px',
         left: this.boxL + 'px',
         top: this.boxT + 'px',
-        borderWidth: this.borderW + 'px'
+        borderWidth: this.borderW + 'px',
+        borderColor: this.borderColor,
       }
     },
     cla() {
