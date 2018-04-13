@@ -96,7 +96,7 @@ export default class Ctx {
     this.ctx.restore()
   }
 
-  rect(x, y, w, h, line,color,linecolor, alpha) {
+  rect(x, y, w, h, line, color, linecolor, alpha) {
     this.ctx.save()
     this.ctx.globalAlpha = 1
     this.ctx.fillStyle = color
@@ -107,23 +107,23 @@ export default class Ctx {
       y = y+1*line
       w = w-2*line
       h = w+2*line
-      this.ctx.strokeRect(x-0.5*line, y-0.5*line, w+1*line, h+1*line)
+      this.ctx.strokeRect(x-0.5*line, y-0.5*line, w+1*line, h+1*line)   //防止border和fill的矩形重叠
     }
     this.ctx.globalAlpha = alpha
     this.ctx.fillRect(x, y, w, h)
     this.ctx.restore()
   }
 
-  arc(x, y, a, b, color, alpha) {
+  arc(x, y, a, b, line, color, linecolor, alpha) {
     this.ctx.save()
-    this.ctx.globalAlpha = alpha
     this.ctx.fillStyle = color
-    this.arcPath(x, y, a, b)
+    this.arcPath(x, y, a, b,linecolor,line)
+    this.ctx.globalAlpha = alpha
     this.ctx.fill()
     this.ctx.restore()
   }
 
-  arcPath(x, y, a, b) {
+  arcPath(x, y, a, b, linecolor, line) {
     let r = (a > b) ? a : b
     let ratioX = a / r
     let ratioY = b / r
@@ -131,6 +131,15 @@ export default class Ctx {
     this.ctx.beginPath()
     this.ctx.arc(x / ratioX, y / ratioY, r, 0, 2 * Math.PI, false)
     this.ctx.closePath()
+    if (line!=0) {
+      this.ctx.globalAlpha = 1
+      this.ctx.lineWidth = line
+      this.ctx.strokeStyle = linecolor
+      this.ctx.stroke()
+      this.ctx.beginPath()        //重画内圈圆，防止border和fill的圆重叠
+      this.ctx.arc(x / ratioX, y / ratioY, r-0.5*line, 0, 2 * Math.PI, false)
+      this.ctx.closePath()
+    }
   }
 
   textW(txt, fz, fm) {

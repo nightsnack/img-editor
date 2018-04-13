@@ -116,7 +116,7 @@
       </div>
       <div class="toolbar enhance figure-enhance" :style="enhanceSty" v-show="showFigure">
         <div class="menu">
-          <List :btns="figureList" v-model="figureNow"></List>
+          <List :btns="figureList" v-model="figureNow" @input="figureInputChange"></List>
           <label>
             填充颜色
             <input type="text" readonly="true" @click="toggleFigureColorPicker" :style="colorFigureInputSty" class="color-picker-input" />
@@ -178,7 +178,7 @@
         <Box :show="showMosaic" :width="mosaicW" :height="mosaicH" :left="mosaicL" :top="mosaicT" :borderW="mosaicBorderW" :canvasW="canvasW" :canvasH="canvasH" :canDrag="mosaicCanDrag" :canvas="$refs.canvas" @change="mosaicChange">
           <div :style="mosaicSty"></div>
         </Box>
-        <Box :borderColor="lineColors.hex" :show="showFigure" :width="figureW" :height="figureH" :left="figureL" :top="figureT" :borderW="figureBorderW"  :canvasW="canvasW" :canvasH="canvasH" :canDrag="figureCanDrag" :canvas="$refs.canvas" @change="figureChange">
+        <Box :show="showFigure" :width="figureW" :height="figureH" :left="figureL" :top="figureT" :borderW="figureBorderW"  :canvasW="canvasW" :borderColor="lineColors.hex" :borderRadius="borderR" :canvasH="canvasH" :canDrag="figureCanDrag" :canvas="$refs.canvas" @change="figureChange">
           <div :style="figureSty"></div>
         </Box>
       </div>
@@ -284,6 +284,7 @@ export default {
       lineColors: {
         hex: "#000000"
       },
+      borderR:0,
 
       // action state
       canPaint: false,
@@ -328,7 +329,7 @@ export default {
       figureLineShowShadowColorPicker:false,
       figureList: figureList,
       figureNow: 0,
-
+      
       // filter state
       filterList: filterList,
       filterNow: 0,
@@ -767,6 +768,11 @@ export default {
       this.figureT = status.top
     },
 
+    figureInputChange(id) {
+      this.borderR = (id == 0) ? '0' : '50%'
+      console.log(id)
+    },
+
     paintFigure() {
       let color = this.figureColors.hex
       let linecolor = this.lineColors.hex
@@ -774,7 +780,7 @@ export default {
       if (this.figureNow == 0) {
         DATA.ctx.rect(this.figureL, this.figureT, this.figureW, this.figureH, this.figureBorderW, color,linecolor, alpha)
       } else {
-        DATA.ctx.arc(this.figureL + this.figureW / 2, this.figureT + this.figureH / 2, this.figureW / 2, this.figureH / 2, color, alpha)
+        DATA.ctx.arc(this.figureL + this.figureW / 2, this.figureT + this.figureH / 2, this.figureW / 2, this.figureH / 2, this.figureBorderW, color, linecolor, alpha)
       }
       DATA.timeMachine.add()
     },
@@ -791,6 +797,7 @@ export default {
       this.figureBorderW = 1
       this.figureColors.hex = '#9E4949'
       this.lineColors.hex = '#000000'
+      this.borderR = 0
     },
 
     // filter
